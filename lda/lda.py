@@ -101,6 +101,8 @@ class LDA:
         # other than return the current numpy RandomState
         self.random_state = random_state
         self.refresh = refresh
+        self.component_chains = []
+        self.doc_topic_chains = []
 
         if alpha <= 0 or eta <= 0:
             raise ValueError("alpha and eta must be greater than zero")
@@ -258,6 +260,9 @@ class LDA:
         self.topic_word_ = self.components_
         self.doc_topic_ = (self.ndz_ + self.alpha).astype(float)
         self.doc_topic_ /= np.sum(self.doc_topic_, axis=1)[:, np.newaxis]
+        
+        self.component_chains.append(self.components_)
+        self.doc_topic_chains.append(self.doc_topic_)
 
         # delete attributes no longer needed after fitting to save memory and reduce clutter
         del self.WS
