@@ -251,6 +251,12 @@ class LDA:
                 logger.info("<{}> log likelihood: {:.0f}".format(it, ll))
                 # keep track of loglikelihoods for monitoring convergence
                 self.loglikelihoods_.append(ll)
+                comps_ = (self.nzw_ + self.eta).astype(float)
+                comps_/= np.sum(comps_, axis=1)[:, np.newaxis]
+                doc_tops = (self.ndz_ + self.alpha).astype(float)
+                doc_tops  /= np.sum(doc_tops , axis=1)[:, np.newaxis]
+                self.component_chains.append(comps_)
+                self.doc_topic_chains.append(doc_tops)
             self._sample_topics(rands)
         ll = self.loglikelihood()
         logger.info("<{}> log likelihood: {:.0f}".format(self.n_iter - 1, ll))
@@ -260,9 +266,6 @@ class LDA:
         self.topic_word_ = self.components_
         self.doc_topic_ = (self.ndz_ + self.alpha).astype(float)
         self.doc_topic_ /= np.sum(self.doc_topic_, axis=1)[:, np.newaxis]
-        
-        self.component_chains.append(self.components_)
-        self.doc_topic_chains.append(self.doc_topic_)
 
         # delete attributes no longer needed after fitting to save memory and reduce clutter
         del self.WS
