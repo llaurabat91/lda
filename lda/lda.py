@@ -246,24 +246,27 @@ class LDA:
         for it in range(self.n_iter):
             # FIXME: using numpy.roll with a random shift might be faster
             random_state.shuffle(rands)
+            self._sample_topics(rands) # before it was after likelihood block
             if it % self.refresh == 0:
                 ll = self.loglikelihood()
                 logger.info("<{}> log likelihood: {:.0f}".format(it, ll))
                 # keep track of loglikelihoods for monitoring convergence
                 self.loglikelihoods_.append(ll)
-                #comps_ = (self.nzw_ + self.eta).astype(float)
-                #comps_/= np.sum(comps_, axis=1)[:, np.newaxis]
-                #doc_tops = (self.ndz_ + self.alpha).astype(float)
-                #doc_tops  /= np.sum(doc_tops , axis=1)[:, np.newaxis]
-                #self.component_chains.append(comps_)
-                #self.doc_topic_chains.append(doc_tops)
-            self._sample_topics(rands)
-            comps_ = (self.nzw_ + self.eta).astype(float)
-            comps_/= np.sum(comps_, axis=1)[:, np.newaxis]
-            doc_tops = (self.ndz_ + self.alpha).astype(float)
-            doc_tops  /= np.sum(doc_tops , axis=1)[:, np.newaxis]
-            self.component_chains.append(comps_)
-            self.doc_topic_chains.append(doc_tops)
+                
+                comps_ = (self.nzw_ + self.eta).astype(float)
+                comps_/= np.sum(comps_, axis=1)[:, np.newaxis]
+                doc_tops = (self.ndz_ + self.alpha).astype(float)
+                doc_tops  /= np.sum(doc_tops , axis=1)[:, np.newaxis]
+                self.component_chains.append(comps_)
+                self.doc_topic_chains.append(doc_tops)
+                
+            # this is if you want to store all iterations
+            #comps_ = (self.nzw_ + self.eta).astype(float)
+            #comps_/= np.sum(comps_, axis=1)[:, np.newaxis]
+            #doc_tops = (self.ndz_ + self.alpha).astype(float)
+            #doc_tops  /= np.sum(doc_tops , axis=1)[:, np.newaxis]
+            #self.component_chains.append(comps_)
+            #self.doc_topic_chains.append(doc_tops)
         ll = self.loglikelihood()
         logger.info("<{}> log likelihood: {:.0f}".format(self.n_iter - 1, ll))
         # note: numpy /= is integer division
