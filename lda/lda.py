@@ -249,7 +249,7 @@ class LDA:
             self._sample_topics(rands) # before it was after likelihood block
             if it % self.refresh == 0:
                 ll = self.loglikelihood()
-                logger.info("<{}> log likelihood: {:.0f}".format(it, ll))
+                #logger.info("<{}> log likelihood: {:.0f}".format(it, ll))
                 # keep track of loglikelihoods for monitoring convergence
                 self.loglikelihoods_.append(ll)
                 
