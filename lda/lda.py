@@ -92,7 +92,7 @@ class LDA:
     """
 
     def __init__(self, n_topics, n_iter=2000, alpha=0.1, eta=0.01, random_state=None,
-                 refresh=10):
+                 refresh=10, init_to_prior=False, theta_init=None):
         self.n_topics = n_topics
         self.n_iter = n_iter
         self.alpha = alpha
@@ -103,6 +103,8 @@ class LDA:
         self.refresh = refresh
         self.component_chains = []
         self.doc_topic_chains = []
+        self.init_to_prior = init_to_prior
+        self.theta_init = theta_init
 
         if alpha <= 0 or eta <= 0:
             raise ValueError("alpha and eta must be greater than zero")
@@ -302,7 +304,12 @@ class LDA:
         np.testing.assert_equal(N, len(WS))
         for i in range(N):
             w, d = WS[i], DS[i]
-            z_new = i % n_topics
+            if self.init_to_prior:
+                cat_topic = np.random.multinomial(n=1,pvals=self.theta_init[DS[i]])
+                z_new = np.where(cat_topic==1)[0][0]
+                
+            else:
+                z_new = i % n_topics
             ZS[i] = z_new
             ndz_[d, z_new] += 1
             nzw_[z_new, w] += 1
